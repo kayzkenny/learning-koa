@@ -6,9 +6,9 @@ const app = new Koa();
 const router = new Router();
 const port = 4000;
 
-app.use(bodyParser()).use(router.routes()).use(router.allowedMethods());
+app.use(bodyParser()).use(router.routes());
 
-let posts = [
+const posts = [
   {
     id: "1",
     name: "PHP Developer",
@@ -38,7 +38,7 @@ router.get("/posts", (ctx) => {
 
 // POST -> create a new post
 router.post("/posts", (ctx) => {
-  // get the post's id, name and content using array destructuring
+  // get the post's id from the request body, name and content using array destructuring
   let { id, name, content } = ctx.request.body;
 
   // handle response when id || name || content is undefinded
@@ -72,6 +72,25 @@ router.get("/posts/:id", (ctx) => {
 // DELETE -> delete a post with an id
 router.del("/posts/:id", (ctx) => {
   ctx.body = _.remove(posts, (post) => post.id === ctx.params.id);
+});
+
+// PUT -> update a post with an id
+router.put("/posts/:id", (ctx) => {
+  // get the post's id from the request body, name and content using array destructuring
+  let { id, name, content } = ctx.request.body;
+
+  const index = posts.findIndex((post) => post.id === ctx.params.id);
+
+  if (id) {
+    posts[index].id = id;
+  }
+  if (name) {
+    posts[index].name = name;
+  }
+  if (content) {
+    posts[index].content = content;
+  }
+  ctx.body = posts;
 });
 
 app.listen(port);
