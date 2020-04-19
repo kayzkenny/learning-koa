@@ -1,14 +1,14 @@
 const Koa = require("koa");
 const Router = require("koa-router");
 const bodyParser = require("koa-parser");
-
+const _ = require("lodash");
 const app = new Koa();
 const router = new Router();
 const port = 4000;
 
 app.use(bodyParser()).use(router.routes()).use(router.allowedMethods());
 
-const posts = [
+let posts = [
   {
     id: "1",
     name: "PHP Developer",
@@ -67,6 +67,11 @@ router.get("/posts/:id", (ctx) => {
   IDs.includes(ctx.params.id)
     ? (ctx.body = posts.find((post) => post.id === ctx.params.id))
     : ctx.throw(400, `No post with id: ${ctx.params.id}`);
+});
+
+// DELETE -> delete a post with an id
+router.del("/posts/:id", (ctx) => {
+  ctx.body = _.remove(posts, (post) => post.id === ctx.params.id);
 });
 
 app.listen(port);
