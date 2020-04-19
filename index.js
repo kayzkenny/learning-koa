@@ -6,7 +6,7 @@ const app = new Koa();
 const router = new Router();
 const port = 4000;
 
-app.use(bodyParser());
+app.use(bodyParser()).use(router.routes()).use(router.allowedMethods());
 
 const posts = [
   {
@@ -26,17 +26,22 @@ const posts = [
   },
 ];
 
+// GET -> default endpoint
 router.get("/", (ctx) => {
   ctx.body = "Welcome to Koa Router";
 });
 
+// GET -> all posts endpoints
 router.get("/posts", (ctx) => {
   ctx.body = posts;
 });
 
+// POST -> create a new post
 router.post("/posts", (ctx) => {
+  // get the post's id, name and content using array destructuring
   let { id, name, content } = ctx.request.body;
 
+  // handle response when id || name || content is undefinded
   switch (undefined) {
     case id:
       ctx.throw(400, "id is required field");
@@ -52,6 +57,16 @@ router.post("/posts", (ctx) => {
   }
 });
 
-app.use(router.routes()).use(router.allowedMethods());
+// POST -> find a post with an id
+router.get("/posts/:id", (ctx) => {
+  let IDs = [];
+
+  posts.forEach((post) => IDs.push(post.id));
+
+  // handle response when id is not found
+  IDs.includes(ctx.params.id)
+    ? (ctx.body = posts.find((post) => post.id === ctx.params.id))
+    : ctx.throw(400, `No post with id: ${ctx.params.id}`);
+});
 
 app.listen(port);
